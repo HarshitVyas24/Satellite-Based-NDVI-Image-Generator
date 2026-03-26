@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>NDVI Dashboard</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        textarea { width: 400px; height: 150px; }
+        #ndviImage { margin-top: 20px; max-width: 600px; border: 2px solid #444; }
+    </style>
+</head>
+<body>
+
+    <h2>NDVI Land Monitoring</h2>
+
+    <label>AOI (GeoJSON Polygon):</label><br>
+    <textarea id="aoi"></textarea><br><br>
+
+    <label>Start Date:</label><br>
+    <input type="date" id="start"><br><br>
+
+    <label>End Date:</label><br>
+    <input type="date" id="end"><br><br>
+
+    <button onclick="generateNDVI()">Generate NDVI</button>
+
+    <div id="result"></div>
+
+    <img id="ndviImage" />
+
+<script>
+function generateNDVI() {
+    let aoiText = document.getElementById("aoi").value;
+
+    let start = document.getElementById("start").value;
+    let end = document.getElementById("end").value;
+
+    let aoi;
+
+    try {
+        aoi = JSON.parse(aoiText);   // Convert text → JSON
+    } catch (e) {
+        alert("Invalid GeoJSON!");
+        return;
+    }
+
+    fetch("http://127.0.0.1:5000/ndvi", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            aoi: aoi,
+            start_date: start,
+            end_date: end
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log(data);
+
+        if (data.error) {
+            document.getElementById("result").innerHTML =
+                `<p style='color:red;'>Error: ${data.error}</p>`;
+            return;
+        }
+
+        document.getElementById("ndviImage").src = data.thumb_url;
+
+        document.getElementById("result").innerHTML =
+            `<p>NDVI Generated Successfully 🎉</p>`;
+    });
+}
+</script>
+
+</body>
+</html>
+

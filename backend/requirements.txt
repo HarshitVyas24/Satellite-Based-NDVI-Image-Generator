@@ -1,0 +1,9 @@
+flask
+earthengine-api
+google-cloud-storage
+opencv-python-headless
+numpy
+rasterio
+scikit-learn
+pillow
+matplotlib
